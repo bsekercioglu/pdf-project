@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
@@ -82,5 +82,30 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <div className="max-w-md mx-auto mt-12">
+      <div className="mb-6 text-center">
+        <Link href="/" className="text-blue-600 hover:underline">← Ana Sayfa</Link>
+      </div>
+      <div className="bg-white p-8 rounded-xl shadow border border-slate-200 animate-pulse">
+        <div className="h-8 bg-slate-200 rounded w-1/3 mb-2" />
+        <div className="h-4 bg-slate-100 rounded w-2/3 mb-6" />
+        <div className="h-10 bg-slate-100 rounded mb-4" />
+        <div className="h-10 bg-slate-100 rounded mb-4" />
+        <div className="h-10 bg-slate-200 rounded" />
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginForm />
+    </Suspense>
   );
 }
