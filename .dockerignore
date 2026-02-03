@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+.env*.local
+.DS_Store
+temp_files
+outputs
+uploads
+*.log
+npm-debug.log*

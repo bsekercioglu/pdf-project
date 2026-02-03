@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --purple: #6f42c1;
+  --indigo: #6610f2;
+  --teal: #20c997;
+  --orange: #fd7e14;
+}
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.btn-purple { background-color: var(--purple); }
+.btn-indigo { background-color: var(--indigo); }
+.btn-teal { background-color: var(--teal); }
+.btn-orange { background-color: var(--orange); }
