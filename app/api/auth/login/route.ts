@@ -27,11 +27,13 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    await setAuthCookie({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    });
+    const isSecure =
+      request.headers.get('x-forwarded-proto') === 'https' ||
+      (typeof request.url === 'string' && request.url.startsWith('https:'));
+    await setAuthCookie(
+      { id: user.id, email: user.email, name: user.name },
+      { secure: isSecure }
+    );
     return NextResponse.json({
       success: true,
       user: { id: user.id, email: user.email, name: user.name },

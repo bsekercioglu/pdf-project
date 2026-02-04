@@ -46,12 +46,19 @@ export async function getSession(): Promise<SessionUser | null> {
   return verifyToken(token);
 }
 
-export async function setAuthCookie(user: SessionUser): Promise<void> {
+/** Sunucuda giriş sonrası cookie kaydı. secure: true sadece HTTPS'te cookie'yi kabul ettirir; proxy arkasında SECURE_COOKIE=false kullanın. */
+export async function setAuthCookie(
+  user: SessionUser,
+  options?: { secure?: boolean }
+): Promise<void> {
   const token = await createToken(user);
   const cookieStore = await cookies();
+  const secure =
+    options?.secure ??
+    (process.env.SECURE_COOKIE !== 'false' && process.env.NODE_ENV === 'production');
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure,
     sameSite: 'lax',
     maxAge: COOKIE_MAX_AGE,
     path: '/',
