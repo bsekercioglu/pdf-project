@@ -109,8 +109,9 @@ export default function MergePage() {
         <p className="text-sm text-slate-500 mt-1">Maksimum {MAX_FILES} dosya, her biri 50MB&apos;a kadar. Yeni seçtiğiniz dosyalar listeye eklenir.</p>
 
         {files.length > 0 && (
-          <div className="mt-4">
-            <p className="text-sm font-medium text-slate-700 mb-2">Sıra (sürükleyerek değiştirin, birleştirme sırası buradaki gibi olur):</p>
+          <div className="mt-4 p-4 rounded-lg border-2 border-blue-100 bg-blue-50/50">
+            <p className="text-sm font-medium text-slate-700 mb-1">{files.length} dosya seçildi.</p>
+            <p className="text-sm text-slate-600 mb-3">Sırayı değiştirmek için satırı sürükleyin, çıkarmak için çöp kutusuna tıklayın.</p>
             <ul className="space-y-2">
               {files.map((file, index) => (
                 <li
@@ -121,9 +122,9 @@ export default function MergePage() {
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg border bg-slate-50 transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg border bg-white transition-colors ${
                     draggedIndex === index ? 'opacity-50 border-blue-400' : ''
-                  } ${dragOverIndex === index ? 'border-blue-500 bg-blue-50' : 'border-slate-200'}`}
+                  } ${dragOverIndex === index ? 'border-blue-500 bg-blue-100' : 'border-slate-200'}`}
                 >
                   <span
                     className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600"
