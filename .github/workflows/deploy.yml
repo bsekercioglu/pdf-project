@@ -1,20 +1,21 @@
 name: Deploy to Ubuntu
+
 on:
   push:
     branches: [ main ]
-    workflow_dispatch: # <-- Bu satırı eklersen manuel buton açılır
+  workflow_dispatch: # Manuel butonun çalışması için bu satır hizalı olmalı
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-  steps:
+    steps:
       - name: SSH ile Sunucuya Bağlan ve Scripti Çalıştır
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: zekasoft # Burası mutlaka zekasoft olmalı
+          username: zekasoft
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
             cd /home/zekasoft/pdf-project
             ./deploy.sh
-    
