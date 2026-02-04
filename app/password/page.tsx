@@ -2,13 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import DropZone from '@/components/FileUpload/DropZone';
+import { FileList } from '@/components/FileUpload/FileList';
 
 export default function PasswordPage() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [operation, setOperation] = useState<'encrypt' | 'decrypt'>('encrypt');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const file = files[0] ?? null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,11 +58,18 @@ export default function PasswordPage() {
       <form onSubmit={onSubmit} className="bg-white p-6 rounded-xl shadow border border-slate-200 space-y-4">
         <div>
           <label className="block font-medium text-slate-700 mb-2">PDF Dosyası</label>
-          <input type="file" accept=".pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-indigo-50 file:text-indigo-600" />
+          <DropZone
+            onFiles={(f) => setFiles(f.slice(0, 1))}
+            accept=".pdf"
+            label="PDF dosyasını buraya sürükleyin veya tıklayın"
+            hint="Tek dosya"
+            accentColor="indigo"
+          />
+          <FileList files={files} onRemove={(i) => setFiles((prev) => prev.filter((_, idx) => idx !== i))} acceptLabel="dosya" />
         </div>
         <div>
           <label className="block font-medium text-slate-700 mb-2">İşlem</label>
-          <select value={operation} onChange={(e) => setOperation(e.target.value as any)} className="w-full border border-slate-300 rounded-lg px-3 py-2">
+          <select value={operation} onChange={(e) => setOperation(e.target.value as 'encrypt' | 'decrypt')} className="w-full border border-slate-300 rounded-lg px-3 py-2">
             <option value="encrypt">Şifrele</option>
             <option value="decrypt">Şifreyi kaldır</option>
           </select>

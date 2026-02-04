@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import DropZone from '@/components/FileUpload/DropZone';
+import { FileList } from '@/components/FileUpload/FileList';
 
 const MAX_FILES = 10;
 
@@ -9,22 +11,10 @@ export default function MergePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files || []);
-    const pdfs = selected.filter((f) => f.name.toLowerCase().endsWith('.pdf'));
+  const onFilesAdded = (newFiles: File[]) => {
     setError('');
-    setFiles((prev) => {
-      const combined = [...prev];
-      for (const f of pdfs) {
-        if (combined.length >= MAX_FILES) break;
-        combined.push(f);
-      }
-      return combined.slice(0, MAX_FILES);
-    });
-    e.target.value = '';
+    setFiles((prev) => [...prev, ...newFiles].slice(0, MAX_FILES));
   };
 
   const removeFile = (index: number) => {
@@ -40,24 +30,6 @@ export default function MergePage() {
       next.splice(toIndex, 0, removed);
       return next;
     });
-  };
-
-  const handleDragStart = (index: number) => setDraggedIndex(index);
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    setDragOverIndex(index);
-  };
-  const handleDragLeave = () => setDragOverIndex(null);
-  const handleDrop = (e: React.DragEvent, toIndex: number) => {
-    e.preventDefault();
-    setDragOverIndex(null);
-    if (draggedIndex === null) return;
-    moveFile(draggedIndex, toIndex);
-    setDraggedIndex(null);
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -99,62 +71,23 @@ export default function MergePage() {
       <p className="text-slate-600 mb-6">Birden fazla PDF dosyasını tek dosyada birleştirin. Sırayı sürükleyerek değiştirebilir, istemediğinizi listeden çıkarabilirsiniz.</p>
       <form onSubmit={onSubmit} className="bg-white p-6 rounded-xl shadow border border-slate-200">
         <label className="block font-medium text-slate-700 mb-2">PDF Dosyaları (en az 2)</label>
-        <input
-          type="file"
+        <DropZone
+          onFiles={onFilesAdded}
           accept=".pdf"
           multiple
-          onChange={onFileChange}
-          className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-50 file:text-blue-600"
+          maxFiles={MAX_FILES}
+          label="PDF dosyalarını buraya sürükleyin veya tıklayın"
+          hint={`Maksimum ${MAX_FILES} dosya, her biri 50MB. Yeni seçilenler listeye eklenir.`}
+          accentColor="blue"
         />
-        <p className="text-sm text-slate-500 mt-1">Maksimum {MAX_FILES} dosya, her biri 50MB&apos;a kadar. Yeni seçtiğiniz dosyalar listeye eklenir.</p>
-
-        {files.length > 0 && (
-          <div className="mt-4 p-4 rounded-lg border-2 border-blue-100 bg-blue-50/50">
-            <p className="text-sm font-medium text-slate-700 mb-1">{files.length} dosya seçildi.</p>
-            <p className="text-sm text-slate-600 mb-3">Sırayı değiştirmek için satırı sürükleyin, çıkarmak için çöp kutusuna tıklayın.</p>
-            <ul className="space-y-2">
-              {files.map((file, index) => (
-                <li
-                  key={`${file.name}-${index}`}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragEnd={handleDragEnd}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, index)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg border bg-white transition-colors ${
-                    draggedIndex === index ? 'opacity-50 border-blue-400' : ''
-                  } ${dragOverIndex === index ? 'border-blue-500 bg-blue-100' : 'border-slate-200'}`}
-                >
-                  <span
-                    className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600"
-                    title="Sürükleyerek sırayı değiştir"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-                    </svg>
-                  </span>
-                  <span className="flex-1 truncate text-sm text-slate-800" title={file.name}>
-                    {index + 1}. {file.name}
-                  </span>
-                  <span className="text-xs text-slate-500">{(file.size / 1024).toFixed(1)} KB</span>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="p-1.5 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                    title="Listeden çıkar"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 text-sm text-slate-500">{files.length} dosya • En az 2 olmalı</p>
-          </div>
-        )}
-
+        <FileList
+          files={files}
+          onRemove={removeFile}
+          onReorder={moveFile}
+          reorderable
+          acceptLabel="dosya"
+        />
+        {files.length > 0 && <p className="mt-2 text-sm text-slate-500">En az 2 dosya olmalı.</p>}
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         <button
           type="submit"

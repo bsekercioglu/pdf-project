@@ -2,12 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import DropZone from '@/components/FileUpload/DropZone';
+import { FileList } from '@/components/FileUpload/FileList';
 
 export default function CompressPage() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [quality, setQuality] = useState<'high' | 'medium' | 'low'>('medium');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const file = files[0] ?? null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,11 +52,17 @@ export default function CompressPage() {
       <form onSubmit={onSubmit} className="bg-white p-6 rounded-xl shadow border border-slate-200 space-y-4">
         <div>
           <label className="block font-medium text-slate-700 mb-2">PDF Dosyası</label>
-          <input type="file" accept=".pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-slate-100 file:text-slate-700" />
+          <DropZone
+            onFiles={(f) => setFiles(f.slice(0, 1))}
+            accept=".pdf"
+            label="PDF dosyasını buraya sürükleyin veya tıklayın"
+            hint="Tek dosya, 50MB'a kadar"
+          />
+          <FileList files={files} onRemove={() => setFiles([])} acceptLabel="dosya" />
         </div>
         <div>
           <label className="block font-medium text-slate-700 mb-2">Kalite</label>
-          <select value={quality} onChange={(e) => setQuality(e.target.value as any)} className="w-full border border-slate-300 rounded-lg px-3 py-2">
+          <select value={quality} onChange={(e) => setQuality(e.target.value as 'high' | 'medium' | 'low')} className="w-full border border-slate-300 rounded-lg px-3 py-2">
             <option value="high">Yüksek</option>
             <option value="medium">Orta</option>
             <option value="low">Düşük (daha küçük dosya)</option>

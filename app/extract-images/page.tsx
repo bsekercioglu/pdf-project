@@ -2,11 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import DropZone from '@/components/FileUpload/DropZone';
+import { FileList } from '@/components/FileUpload/FileList';
 
 export default function ExtractImagesPage() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const file = files[0] ?? null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +50,14 @@ export default function ExtractImagesPage() {
       <form onSubmit={onSubmit} className="bg-white p-6 rounded-xl shadow border border-slate-200 space-y-4">
         <div>
           <label className="block font-medium text-slate-700 mb-2">PDF Dosyası</label>
-          <input type="file" accept=".pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-red-50 file:text-red-600" />
+          <DropZone
+            onFiles={(f) => setFiles(f.slice(0, 1))}
+            accept=".pdf"
+            label="PDF dosyasını buraya sürükleyin veya tıklayın"
+            hint="Tek dosya, 50MB'a kadar"
+            accentColor="blue"
+          />
+          <FileList files={files} onRemove={() => setFiles([])} acceptLabel="dosya" />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button type="submit" disabled={loading || !file} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"> {loading ? 'İşleniyor...' : 'Görselleri Çıkar ve İndir'} </button>

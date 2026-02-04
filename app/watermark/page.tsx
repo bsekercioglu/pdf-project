@@ -2,14 +2,19 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import DropZone from '@/components/FileUpload/DropZone';
+import { FileList } from '@/components/FileUpload/FileList';
 
 export default function WatermarkPage() {
-  const [file, setFile] = useState<File | null>(null);
+  const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [watermarkType, setWatermarkType] = useState<'text' | 'image'>('text');
   const [watermarkText, setWatermarkText] = useState('');
-  const [watermarkImage, setWatermarkImage] = useState<File | null>(null);
+  const [watermarkImageFiles, setWatermarkImageFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const file = pdfFiles[0] ?? null;
+  const watermarkImage = watermarkImageFiles[0] ?? null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,11 +65,18 @@ export default function WatermarkPage() {
       <form onSubmit={onSubmit} className="bg-white p-6 rounded-xl shadow border border-slate-200 space-y-4">
         <div>
           <label className="block font-medium text-slate-700 mb-2">PDF Dosyası</label>
-          <input type="file" accept=".pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-teal-50 file:text-teal-600" />
+          <DropZone
+            onFiles={(f) => setPdfFiles(f.slice(0, 1))}
+            accept=".pdf"
+            label="PDF dosyasını buraya sürükleyin veya tıklayın"
+            hint="Tek dosya"
+            accentColor="teal"
+          />
+          <FileList files={pdfFiles} onRemove={(i) => setPdfFiles((prev) => prev.filter((_, idx) => idx !== i))} acceptLabel="dosya" />
         </div>
         <div>
           <label className="block font-medium text-slate-700 mb-2">Filigran türü</label>
-          <select value={watermarkType} onChange={(e) => setWatermarkType(e.target.value as any)} className="w-full border border-slate-300 rounded-lg px-3 py-2">
+          <select value={watermarkType} onChange={(e) => setWatermarkType(e.target.value as 'text' | 'image')} className="w-full border border-slate-300 rounded-lg px-3 py-2">
             <option value="text">Metin</option>
             <option value="image">Görsel</option>
           </select>
@@ -78,7 +90,14 @@ export default function WatermarkPage() {
         {watermarkType === 'image' && (
           <div>
             <label className="block font-medium text-slate-700 mb-2">Filigran görseli (PNG/JPG)</label>
-            <input type="file" accept=".png,.jpg,.jpeg" onChange={(e) => setWatermarkImage(e.target.files?.[0] || null)} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-teal-50 file:text-teal-600" />
+            <DropZone
+              onFiles={(f) => setWatermarkImageFiles(f.slice(0, 1))}
+              accept=".png,.jpg,.jpeg"
+              label="Filigran görselini buraya sürükleyin veya tıklayın"
+              hint="Tek dosya"
+              accentColor="teal"
+            />
+            <FileList files={watermarkImageFiles} onRemove={(i) => setWatermarkImageFiles((prev) => prev.filter((_, idx) => idx !== i))} acceptLabel="görsel" />
           </div>
         )}
         {error && <p className="text-sm text-red-600">{error}</p>}
