@@ -1,3 +1,4 @@
+[![Deploy to Ubuntu](https://github.com/bsekercioglu/pdf-project/actions/workflows/deploy.yml/badge.svg)](https://github.com/bsekercioglu/pdf-project/actions/workflows/deploy.yml)
 # PDF İşleme Merkezi (Next.js)
 
 Tüm PDF işlemleriniz için Next.js tabanlı web uygulaması. Giriş/kayıt, kullanıcıya özel dosya listesi ve 1 ay sonra otomatik silme destekler. Ubuntu üzerinde Docker ile çalıştırılabilir...
