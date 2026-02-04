@@ -6,14 +6,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
+  steps:
       - name: SSH ile Sunucuya Bağlan ve Scripti Çalıştır
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: zekasoft # Sunucu kullanıcı adın (root veya ubuntu)
+          username: zekasoft # Burası mutlaka zekasoft olmalı
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
             cd /home/zekasoft/pdf-project
             ./deploy.sh
+    
